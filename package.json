@@ -1,0 +1,31 @@
+{
+  "name": "pimpline",
+  "version": "0.1.0",
+  "description": "Task.js-compilant incremental async pipeline for node.js.
+",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/paulmillr/pimpline"
+  },
+  "keywords": [
+    "pipeline",
+    "assets",
+    "pimp",
+    "robust"
+  ],
+  "author": "Paul Miller (paulmillr.com)",
+  "license": "MIT",
+  "dependencies": {
+    "coffee-script": "~1.5.0",
+    "chokidar": "~0.5.3",
+    "handlebars": "~1.0.9",
+    "debug": "~0.7.2",
+    "mkdirp": "~0.3.5",
+    "async": "~0.2.5",
+    "rimraf": "~2.1.4"
+  }
+}
