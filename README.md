@@ -6,7 +6,8 @@ Currently only a prototype, WIP.
 
 ## Workflow
 
-```
+```coffeescript
+# “Input” is a simple object. Minimal example: {path: 'a.js'}.
 list()          # List inputs. Returns {path: '...', stats: file-stats}.
   .then(read)   # Read inputs. Adds data prop to input. => {path, stats, data}
   .then(copy)   # Copy inputs. Passes data to next input unchanged.
