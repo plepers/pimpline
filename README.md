@@ -27,9 +27,6 @@ Config example:
 exports.list =
   locations: '{app,test,vendor}'
 
-exports.watch =
-  locations: exports.list.locations
-
 exports.read =
   filterer: (input) ->
     not /assets/.test input.path
@@ -43,11 +40,11 @@ exports.concat =
   groups:
     'javascripts/app.js':
       filterer: (input) ->
-        input.type is 'javascript' and /^app/.test input.path
+        /\.js$/.test(input.path) and /^app/.test input.path
 
     'javascripts/vendor.js':
       filterer: (input) ->
-        input.type is 'javascript' and /^app/.test input.path
+        /\.js$/.test(input.path) and /^app/.test input.path
 
       order:
         before: [
@@ -62,26 +59,22 @@ exports.concat =
 
     'test/javascripts/test.js':
       filterer: (input) ->
-        input.type is 'javascript' and /^test[\\/](?!vendor)/.test input.path
+        /\.js$/.test(input.path) and /^test[\\/](?!vendor)/.test input.path
 
     'test/javascripts/test-vendor.js':
       filterer: (input) ->
-        input.type is 'javascript' and /^test[\\/](?=vendor)/.test input.path
+        /\.js$/.test(input.path) and /^test[\\/](?=vendor)/.test input.path
 
     'stylesheets/app.css':
       filterer: (input) ->
-        input.type is 'stylesheet' and /^(app|vendor)/.test input.path
+        /\.css$/.test(input.path) and /^(app|vendor)/.test input.path
 
       order:
         after: ['vendor/styles/helpers.css']
 
     'test/stylesheets/test.css':
       filterer: (input) ->
-        input.type is 'stylesheet' and /^test/.test input.path
-
-# params for watch task
-exports.watch =
-  tasks: exports.tasks.build
+        /\.css$/.test(input.path) and /^test/.test input.path
 
 exports.tasks =
   build: [
