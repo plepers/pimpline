@@ -1,8 +1,9 @@
-var sysPath = require('path');
-var mkdirp = require('mkdirp');
 var when = require('when');
 var nodeWhen = require('when/node/function');
 var wrap = nodeWhen.call;
+
+var sysPath = require('path');
+var mkdirp = require('mkdirp');
 
 var getAssetDirectory = function(path, convention) {
   var splitted = path.split(sysPath.sep);

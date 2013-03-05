@@ -3,6 +3,7 @@ var nodeWhen = require('when/node/function');
 var wrap = nodeWhen.call;
 var chokidar = require('chokidar');
 
+// lodash debounce
 function debounce(func, wait, immediate) {
   var args,
       result,

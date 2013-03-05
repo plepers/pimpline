@@ -3,7 +3,7 @@ var nodeWhen = require('when/node/function');
 var wrap = nodeWhen.call;
 var uglify = require('uglify-js');
 
-var minify = function(config, inputs) {
+var uglifyTask = function(config, inputs) {
   console.log('minify');
   return when.all(inputs.map(function(input) {
     if (!/\.js$/.test(input.path)) return input;
@@ -19,4 +19,4 @@ var minify = function(config, inputs) {
   }));
 };
 
-module.exports = minify;
+module.exports = uglifyTask;
