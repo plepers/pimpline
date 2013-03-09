@@ -2,8 +2,6 @@ var when = require('when');
 var nodeWhen = require('when/node/function');
 var wrap = nodeWhen.call;
 
-var sortAlphabetically, sortByAfter, sortByBefore, sortByVendor;
-
 var sortAlphabetically = function(a, b) {
   if (a < b) {
     return -1;

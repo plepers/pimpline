@@ -22,12 +22,11 @@ var getMethods = exports.getMethods = function(list, name) {
       return typeof item[name] === 'function';
     })
     .map(function(item) {
-      return item[name].bind(item);
+      item[name] = item[name].bind(item);
+      return item;
     });
 };
 
 var itemsMatchingPath = exports.itemsMatchingPath = function(list, path) {
-  return list.filter(function(item) {
-    return utils.pathMatchesPlugin(path, item);
-  });
+  return list.filter(utils.pathMatchesPlugin.bind(null, path));
 };

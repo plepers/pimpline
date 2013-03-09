@@ -2,7 +2,9 @@
 var when = require('when');
 var nodeWhen = require('when/node/function');
 var wrap = nodeWhen.call;
-var brunchPlugins = require('./brunch');
+var _ = require('lodash');
+var sysPath = require('path');
+var tasks = require('./tasks');
 
 var normalizeChecker = function(item) {
   switch (toString.call(item)) {
@@ -54,10 +56,39 @@ var createJoinConfig = function(configFiles) {
   return Object.freeze(result);
 };
 
+var getPlugins = function(path, brunchConfig) {
+  var rootPath = sysPath.resolve(path);
+  var nodeModules = rootPath + '/' + 'node_modules';
+  var json;
+  try {
+    json = require(sysPath.join(rootPath, 'package.json'));
+  } catch(err) {
+    throw new Error('Current directory is not brunch application root path, as it does not contain package.json: ' + err);
+  }
+  var dependencies = Object.keys(
+    _.extend(json.devDependencies || {}, json.dependencies || {})
+  );
+  return dependencies
+    .filter(function(dependency) {
+      return dependency !== 'brunch' && dependency.indexOf('brunch') !== -1;
+    })
+    .map(function(dependency) {
+      return require(nodeModules + '/' + dependency);
+    })
+    .filter(function(plugin) {
+      return plugin.prototype && plugin.prototype.brunchPlugin;
+    })
+    .map(function(plugin) {
+      return new plugin(brunchConfig);
+    });
+};
+
+var DIR = '/Users/paul/Development/test/a';
+
 var transform = function(brunchConfig) {
   var config = {
     list: {
-      locations: '{app,test,vendor}'
+      locations: DIR + '/{app,test,vendor}/**/*'
     },
     read: {
       filterer: function(input) {return !(/assets/.test(input.path));}
@@ -66,55 +97,30 @@ var transform = function(brunchConfig) {
       destination: 'public',
       filterer: function(input) {return /assets/.test(input.path);}
     },
-    concat: {groups: createJoinConfig(brunchConfig.files)}
+    concat: {groups: createJoinConfig(brunchConfig.files)},
+    brunchPlugins: getPlugins(DIR, brunchConfig)
   };
   return config;
-}
+};
 
 var run = function() {
-  var brunchConfig = {
-    files: {
-      javascripts: {
-        joinTo: {
-          'javascripts/app.js': /^app/,
-          'javascripts/vendor.js': /^vendor/,
-          'test/javascripts/test.js': /^test[\\/](?!vendor)/,
-          'test/javascripts/test-vendor.js': /^test[\\/](?=vendor)/
-        },
-        order: {
-          before: ['vendor/scripts/console-polyfill.js', 'vendor/scripts/jquery-1.9.1.js', 'vendor/scripts/underscore-1.4.4.js', 'vendor/scripts/backbone-0.9.10.js'],
-          after: ['test/vendor/scripts/test-helper.js']
-        }
-      },
-      stylesheets: {
-        joinTo: {
-          'stylesheets/app.css': /^(app|vendor)/,
-          'test/stylesheets/test.css': /^test/
-        },
-        order: {
-          after: ['vendor/styles/helpers.css']
-        }
-      },
-      templates: {
-        joinTo: 'javascripts/app.js'
-      }
-    }
-  };
-
+  var brunchConfig = require('./config');
   var config = transform(brunchConfig);
-
   var bound = {};
-  Object.keys(brunchPlugins).forEach(function(name) {
-    bound[name] = brunchPlugins[name].bind(null, config);
+  var log = function(stuff) {
+    console.log(stuff);
+    return when(stuff);
+  };
+  Object.keys(tasks).forEach(function(name) {
+    bound[name] = tasks[name].bind(null, config);
   });
 
   bound.list()
     .then(bound.read)
     .then(bound.lint)
-    .then(bound.compile)
+    .then(bound.compile, log)
     .then(bound.concat)
     .then(bound.optimize)
-    .then(bound.write)
     .then(bound.onCompile);
 };
 
